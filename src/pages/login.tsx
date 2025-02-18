@@ -6,7 +6,7 @@ const LoginPage = ({ handleLogin }: { handleLogin: (token: string, username: str
 
 	const onLogin = (token: string, username: string) => {
 		handleLogin(token, username);
-		router.push('/data');
+		router.push('/userdata');
 	};
 
 	return <Login onLogin={onLogin} />;

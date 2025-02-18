@@ -29,7 +29,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 				const currentUser = data.users.find((user: any) => user.username === result.username);
 				setUserImage(currentUser?.image || null);
 				setIsLoggedIn(true);
-				router.push('/data');
+				router.push('/');
 			}
 		} catch (error) {
 			setError('An unknown error occurred');
