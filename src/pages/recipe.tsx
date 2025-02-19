@@ -66,7 +66,7 @@ const Recipe = () => {
 							<p><strong>Rating:</strong> {recipe.rating} ({recipe.reviewCount} reviews)</p>
 							<div className="mb-2">
 								{recipe.tags.map((tag: string) => (
-									<span key={tag} className="badge bg-primary me-2">{tag}</span>
+									<span key={tag} onClick={()=> router.push("/recipedata")} style={{ cursor: "pointer" }} className="badge bg-primary me-2">{tag}</span>
 								))}
 							</div>
 						</div>

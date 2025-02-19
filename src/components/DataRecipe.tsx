@@ -63,7 +63,14 @@ const DataRecipe = ({ userToken, username, handleLogout }: DataProps) => {
 					setError(error.message);
 				});
 		} else {
-			setFilteredData(data);
+			fetchData('recipes', userToken, '', '', itemsPerPage, (currentPage - 1) * itemsPerPage)
+				.then(data => {
+					setFilteredData(data.recipes);
+					setTotalItems(data.total);
+				})
+				.catch(error => {
+					setError(error.message);
+				});
 		}
 	}, [searchQuery, selectedTag, userToken, itemsPerPage, currentPage]);
 
@@ -82,6 +89,19 @@ const DataRecipe = ({ userToken, username, handleLogout }: DataProps) => {
 		setCurrentPage(page);
 	};
 
+	const handleClearTag = () => {
+		setSelectedTag(null);
+		setCurrentPage(1);
+		fetchData('recipes', userToken, '', '', itemsPerPage, 0)
+			.then(data => {
+				setFilteredData(data.recipes);
+				setTotalItems(data.total);
+			})
+			.catch(error => {
+				setError(error.message);
+			});
+	};
+
 	if (loading) {
 		return <div>Loading...</div>;
 	}
@@ -96,7 +116,13 @@ const DataRecipe = ({ userToken, username, handleLogout }: DataProps) => {
 		<div className="container mt-4">
 			<NavBar isLoggedIn={isLoggedIn} username={username} handleLogout={handleLogout} userImage={userImage} />
 			<h1>Recipes</h1>
-			{!selectedTag && (
+			{selectedTag ? (
+				<div className="mb-3">
+					<span className="badge bg-primary me-2" style={{ cursor: 'pointer' }} onClick={handleClearTag}>
+						{selectedTag} <span className="badge bg-secondary">x</span>
+					</span>
+				</div>
+			) : (
 				<div className="mb-3">
 					<div className="input-group">
 						<input
@@ -114,8 +140,8 @@ const DataRecipe = ({ userToken, username, handleLogout }: DataProps) => {
 				<select id="itemsPerPage" className="form-select" value={itemsPerPage} onChange={handleItemsPerPageChange}>
 					<option value={5}>5</option>
 					<option value={10}>10</option>
-					<option value={20}>15</option>
-					<option value={20}>30</option>
+					<option value={15}>15</option>
+					<option value={30}>30</option>
 				</select>
 			</div>
 			<div className="accordion" id="dataAccordion">
@@ -168,6 +194,12 @@ const DataRecipe = ({ userToken, username, handleLogout }: DataProps) => {
 			</div>
 			<nav aria-label="Page navigation">
 				<ul className="pagination justify-content-center">
+					<li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+						<button className="page-link" onClick={() => handlePageChange(1)}>&laquo;</button>
+					</li>
+					<li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+						<button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>&lsaquo;</button>
+					</li>
 					{[...Array(totalPages)].map((_, index) => (
 						<li key={index} className={`page-item ${index + 1 === currentPage ? 'active' : ''}`}>
 							<button className="page-link" onClick={() => handlePageChange(index + 1)}>
@@ -175,6 +207,12 @@ const DataRecipe = ({ userToken, username, handleLogout }: DataProps) => {
 							</button>
 						</li>
 					))}
+					<li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+						<button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>&rsaquo;</button>
+					</li>
+					<li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+						<button className="page-link" onClick={() => handlePageChange(totalPages)}>&raquo;</button>
+					</li>
 				</ul>
 			</nav>
 		</div>
