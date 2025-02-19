@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
@@ -22,6 +22,12 @@ const NavBar = ({ isLoggedIn, username, handleLogout, userImage }: { isLoggedIn:
 		}
 	}, [isLoggedIn, username, userImageState]);
 
+	const currentPage = router.pathname;
+
+	if (!isLoggedIn && ["/recipedata", "/userdata", "/recipe", "/profile"].includes(currentPage)) {
+		router.push('/login');
+	}
+
 	return (
 		<nav className='navbar sticky-top flex-wrap align-items-center'>
 			<div className='container-fluid align-items-center'>
@@ -35,10 +41,13 @@ const NavBar = ({ isLoggedIn, username, handleLogout, userImage }: { isLoggedIn:
 					</span>)}
 					{isLoggedIn && (
 						<span className="nav-item">
-							<button className={"btn align-self-center btn-outline-success"} onClick={handleLogout}>
+							{!(["/recipe", "/profile"].includes(currentPage)) && <button className={"btn align-self-center btn-outline-success"} onClick={handleLogout}>
+								<span>Logout</span>
+							</button>}
+							<button className={"btn align-self-center btn-outline-success"} onClick={() => router.push('/profile')}>
 								<span>
 									<img src={userImageState || 'https://placehold.co/50'} alt={username || 'User'} width={"30px"} style={{ borderRadius: '50%' }} /> {username}
-								</span> | Logout
+								</span>
 							</button>
 						</span>
 					)}

@@ -23,18 +23,47 @@ const Profile = () => {
 	}, []);
 
 	useEffect(() => {
-		if (id) {
-			axios.get(`https://dummyjson.com/users/${id}`)
-				.then(response => {
-					setUser(response.data);
-					setLoading(false);
-				})
-				.catch(error => {
+		const fetchUserData = async (userId: string) => {
+			try {
+				const response = await axios.get(`https://dummyjson.com/users/${userId}`);
+				setUser(response.data);
+				setLoading(false);
+			} catch (error) {
+				if (axios.isAxiosError(error)) {
 					setError(error.message);
+				} else {
+					setError('An unknown error occurred');
+				}
+				setLoading(false);
+			}
+		};
+
+		const fetchUserByUsername = async (username: string) => {
+			try {
+				const response = await axios.get(`https://dummyjson.com/users/search?q=${username}`);
+				if (response.data.users.length > 0) {
+					setUser(response.data.users[0]);
 					setLoading(false);
-				});
+				} else {
+					setError('User not found');
+					setLoading(false);
+				}
+			} catch (error) {
+				if (axios.isAxiosError(error)) {
+					setError(error.message);
+				} else {
+					setError('An unknown error occurred');
+				}
+				setLoading(false);
+			}
+		};
+
+		if (id) {
+			fetchUserData(id as string);
+		} else if (username) {
+			fetchUserByUsername(username);
 		}
-	}, [id]);
+	}, [id, username]);
 
 	if (loading) {
 		return <div>Loading...</div>;
